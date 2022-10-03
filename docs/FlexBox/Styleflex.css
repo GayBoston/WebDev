@@ -25,14 +25,14 @@ html {
 }
 
 #left {
-    color: green;
+    color: yellow;
     width: 30%;
-    background-image:linear-gradient(black,red);
+    background-image:linear-gradient(rgb(0, 150, 150),red);
 }
 
 #right {
-    color: green;
+    color: yellow;
     width: 40%;
-    background-image:linear-gradient(red,black);
+    background-image:linear-gradient(red,rgb(0, 150, 150));
     font-size: 40px;
 }

@@ -1,0 +1,18 @@
+{
+  "name": "loginserver",
+  "version": "1.0.0",
+  "description": "Logging in fr",
+  "main": "login.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Logging",
+    "in"
+  ],
+  "author": "Gabriel J. Austin",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
