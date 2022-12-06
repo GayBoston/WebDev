@@ -1,0 +1,98 @@
+body {
+    background-color: green;
+}
+
+@keyframes example {
+from {margin-left: 100%;
+    width: 300%;}
+to {margin-left: 0%;
+    width: 100%;}
+}
+
+@keyframes slide-left {
+    0% {
+      margin-left: 85%;
+      width: 0%; 
+    }
+  
+    50% {
+      margin-left: 0%;
+      width: 0%;
+    }
+
+    100% {
+        margin-left: 85%;
+        width: 0%; 
+      }
+  }
+
+#title {
+    text-align: center;
+    color: black;
+    font-size:350%
+
+}
+
+h1 {
+    animation-name: slide-left;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+}
+
+#text {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-around;
+}
+
+#hands {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;}
+
+#cards {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    /* justify-content: space-between; */
+}
+
+#card {
+    width: 115px;
+}
+
+#info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* justify-content: space-evenly; */
+    
+    /* margin: 15px; */
+}
+
+
+#buttons {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    width:max-content;
+}
+
+#players {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-around;
+}
+
+#player {
+    display: flex;
+    flex-direction: column;
+}
+
+
+#dealer {
+    display: flex;
+    flex-direction: column;
+}

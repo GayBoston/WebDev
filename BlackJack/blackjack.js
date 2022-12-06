@@ -8,6 +8,12 @@ app.use(express.static('public'))
 app.use(express.static('private'))
 app.use(express.urlencoded({ extended: false}))
 
+
+// let p = document.createElement("p");
+// let t = document.createTextNode("TADA");
+// p.appendChild(t);
+// document.appendChild(p);
+
 let card = {
     rank: 3,
     // 1 = Ace
@@ -29,8 +35,9 @@ let game = {
     dealerHand: [],
     playerScore: 0,
     dealerScore: 0,
-    dealerKnown: 0
+    dealerKnown: 0,
 
+    winner: 0
 }
 
 // function randomInt(max) {
@@ -73,6 +80,25 @@ function buildDeck()
         }
     }
 
+    for (let i in deck) {
+        switch (deck[i].suit) {
+            case 1:
+                deck[i].face = "hearts";
+                break;
+            case 2:
+                deck[i].face = "diamonds";
+                break;
+            case 3:
+                deck[i].face = "spades";
+                break;
+            case 4:
+                deck[i].face = "clubs";
+                break;
+            default:
+                break;
+        }
+    }
+
 }
 
 function shuffleDeck()
@@ -105,22 +131,20 @@ function dealCard(deck, hand)
 function calcScore(hand)
 {
     let score = 0;
+    let counter = 0;
 
     for (i = 0; i < hand.length; i++) 
     {
         console.log(hand[i].rank)
         switch (hand[i].rank) 
         {
-            case (1):
+            case 1:
                 score += 11;
+                counter++;
                 break;
-            case (11):
-                score += 10;
-                break;
-            case (12):
-                score += 10;
-                break;
-            case (13):
+            case 11:
+            case 12:
+            case 13:
                 score += 10;
                 break;
             default:
@@ -129,18 +153,19 @@ function calcScore(hand)
         }
 
     }
-
-    if (score > 21) {
-        for (i = 0; i < hand.length; i++)
-        {
-            if (hand[i].rank == 1 && (score-10) <= 21) {
-                score -= 10;
-            }
+    
+    while (score > 21 && counter > 0) {
+        if (counter > 0) {
+            score -= 10;
+            counter--;
         }
     }
+
     console.log(score);
     return score;
 }
+
+
 
 function calcKnownScore(hand)
 {
@@ -310,11 +335,13 @@ function dealerHit(deck, hand)
 
 function display(res) {
     game.playerScore = calcScore(game.playerHand)
+    let link = "BlackJack\PNG-cards-1.3\queen_of_spades2.png"
     res.write(`
     <h1>Blackjack</h1>
     <div>
         <p> Your hand:</p>
         <ul>
+        
     `)
     generateHand(game.playerHand, res)
     res.write(`
@@ -359,17 +386,8 @@ res.write(`
 
 }
 
-
-
- 
-
 restartGame();
 
-// buildDeck();
-// console.log(deck[5].rank)
-// shuffleDeck();
-// console.log(deck[5].rank)
-// let j = 0;
 
 console.log(game.playerHand)
 console.log("hand: " + JSON.stringify(game.playerHand))
@@ -380,100 +398,123 @@ console.log(game.dealerKnown)
 
 
 
-// console.log(deck.length)
-// for (let i = 0; i < deck.length; i++) {
-//     console.log(i + ": " + deck[i].rank + " " + deck[i].suit)
 
-// }
-
-
-
-
-
-// console.log(deck[5].rank)
-
-// app.get("/", (req,res) => {
-
-// })
 
 app.post("/hit", (req,res) => {
     dealCard(deck, game.playerHand)
-    htmlStart(res);
-    display(res);
-    htmlEnd(res);
+    game.playerScore = calcScore(game.playerHand)
+    game.dealerScore = calcScore(game.dealerHand)
+    console.log(game.playerScore)
+    res.json(game)
+    // htmlStart(res);
+    // display(res);
+    // htmlEnd(res);
+});
+
+app.get('/hh', async (req,res) => {
+    let aRes = await fetch("http://localhost:3000/startgame", {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+    let aData = await aRes.json();
+
+    res.json(aData);
+
+    console.log(aData);
+
 })
 
 app.post("/stand", (req,res) => {
-    // res.json(game)
-    htmlStart(res)
     game.playerScore = calcScore(game.playerHand)
     game.dealerScore = calcScore(game.dealerHand)
-    res.write(`
-    <h1>Blackjack</h1>`)
-
-    // player hand
-    res.write(`
-    <div>
-        <p> Your hand:</p>
-        <ul>
-    `)
-    generateHand(game.playerHand, res)
-    res.write(`
-        </ul>
-        <p> Your score: ${game.playerScore}</p>`)
-    if (game.playerScore > 21) {
-        res.write(`<h3>BUST</h3>`)
-    } else if (game.playerScore == 21) {
-        res.write(`<h3>BLACKJACK</h3>`)
+    while (game.dealerScore < 16) {
+        dealCard(deck, game.dealerHand);
+        game.dealerScore = calcScore(game.dealerHand);
     }
+    res.json(game)
+//     htmlStart(res)
+    // game.playerScore = calcScore(game.playerHand)
+    // game.dealerScore = calcScore(game.dealerHand)
+//     res.write(`
+//     <h1>Blackjack</h1>`)
 
-    // dealer hand
-    dealerHit(deck, game.dealerHand);
+//     // player hand
+//     res.write(`
+//     <div>
+//         <p> Your hand:</p>
+//         <ul>
+//     `)
+//     generateHand(game.playerHand, res)
+//     res.write(`
+//         </ul>
+//         <p> Your score: ${game.playerScore}</p>`)
+//     if (game.playerScore > 21) {
+//         res.write(`<h3>BUST</h3>`)
+//     } else if (game.playerScore == 21) {
+//         res.write(`<h3>BLACKJACK</h3>`)
+//     }
 
-    res.write(`
-    <div>
-        <p> Dealer hand:</p>
-        <ul>
-    `)
-    generateHand(game.dealerHand, res)
-    res.write(`
-        </ul>
-        <p> Your score: ${game.dealerScore}</p>`)
-    if (game.dealerScore > 21) {
-        res.write(`<h3>BUST</h3>`)
-    } else if (game.dealerScore == 21) {
-        res.write(`<h3>BLACKJACK</h3>`)
-    }
+//     // dealer hand
+//     dealerHit(deck, game.dealerHand);
+
+//     res.write(`
+//     <div>
+//         <p> Dealer hand:</p>
+//         <ul>
+//     `)
+//     generateHand(game.dealerHand, res)
+//     res.write(`
+//         </ul>
+//         <p> Dealer score: ${game.dealerScore}</p>`)
+//     if (game.dealerScore > 21) {
+//         res.write(`<h3>BUST</h3>`)
+//     } else if (game.dealerScore == 21) {
+//         res.write(`<h3>BLACKJACK</h3>`)
+//     }
 
     
 
-    res.write(`
-    </div>
-    `)
-    game.playerScore = calcScore(game.playerHand)
-    game.dealerScore = calcScore(game.dealerHand)
-    if (game.playerScore > game.dealerScore) {
-        res.write(`<h4>WIN</h4>`)
-    } else if (game.playerScore == game.dealerScore) {
-        res.write(`<h4>TIE</h4>`)
-    } else if (game.playerScore < game.dealerScore) {
-        res.write(`<h4>LOSS</h4>`)
-    }
+//     res.write(`
+//     </div>
+//     `)
+//     game.playerScore = calcScore(game.playerHand)
+//     if (game.playerScore > 21) {
+//         game.playerScore = 0;
+//     }
+//     game.dealerScore = calcScore(game.dealerHand)
+//     if (game.dealerScore > 21) {
+//         game.dealerScore = 0;
+//     }
+//     console.log("Player: " + game.playerScore)
+//     console.log("Dealer: " + game.dealerScore)
+//     if (game.playerScore > game.dealerScore) {
+//         res.write(`<h4>WIN</h4>`)
+//     }
+//     if (game.playerScore == game.dealerScore) {
+//         res.write(`<h4>TIE</h4>`)
+//     }
+//     if (game.playerScore < game.dealerScore) {
+//         res.write(`<h4>LOSS</h4>`)
+//     }
 
-    res.write(`
+//     res.write(`
 
-    <form method="POST" action="/startgame">
-    <input type="submit" value="START OVER">
-</form>`)
-    htmlEnd(res)
+//     <form method="POST" action="/startgame">
+//     <input type="submit" value="START OVER">
+// </form>`)
+//     htmlEnd(res)
 })
 
 app.post("/startgame", (req,res) => {
-    // res.json(game)
-    htmlStart(res);
+    // htmlStart(res);
     restartGame();
-    display(res);
-    htmlEnd(res)
+    res.json(game)
+
+    // display(res);
+    // htmlEnd(res)
 
 
 })
