@@ -8,7 +8,7 @@ document.getElementById("stand").onclick = function() {stand()};
 
 async function start() 
 {
-    let aRes = await fetch("http://localhost:3000/startgame", {
+    let aRes = await fetch("/startgame", {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -24,11 +24,7 @@ async function start()
     document.querySelector('#dealerScore').textContent = ("Score: ");
     document.querySelector('#title').textContent = ("BLACKJACK")
 
-    ////////////////////////////
     let imgs = [];
-    //   for (el in document.querySelector('#card')) {
-    //     console.log("WTF")
-    //   }
 
     for (let i in aData.playerHand)
     {
@@ -60,7 +56,6 @@ async function start()
     console.log(imgs)
     document.querySelector('#playerCards').replaceChildren(...imgs)
 
-
     let dImgs = [];
     for (i = 0; i < 1; i++) 
     {
@@ -91,13 +86,8 @@ async function start()
     }
     document.querySelector('#dealerCards').replaceChildren(...dImgs)
 
-
-
-
-
     console.log(aData.playerScore)
     if (aData.playerScore == 21) {
-        // document.querySelector('#title').textContent = ("WIN")
         document.querySelector('#hit').disabled = true;
 
         
@@ -108,18 +98,12 @@ async function start()
     }
     let elt = document.querySelector('#playerScore')
     elt.textContent = (`Score: ${aData.playerScore}`);
-
-
-
-
-    ////////////////////////////
-    /* this should be moved out of here so it can be used during hits as well*/
     
     console.log(aData.playerHand[1].rank)
 }
 async function hit() {
 
-    let aRes = await fetch("http://localhost:3000/hit", {
+    let aRes = await fetch("/hit", {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -212,7 +196,7 @@ async function hit() {
 
 async function stand() 
 {
-    let aRes = await fetch("http://localhost:3000/stand", {
+    let aRes = await fetch("/stand", {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
